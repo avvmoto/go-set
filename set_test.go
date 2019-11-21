@@ -1,5 +1,7 @@
 package set
 
+// package set implements list which can delete item, specially intended to be able to get all items fast.
+
 import (
 	"fmt"
 	"testing"
@@ -120,6 +122,8 @@ func BenchmarkSet(b *testing.B) {
 	}
 }
 
+// SetMap provie list which satisfy Interface interface.
+// This list simply use map as internal data structure.
 type SetMap struct {
 	items map[int64]struct{}
 }
