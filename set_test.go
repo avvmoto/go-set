@@ -1,7 +1,5 @@
 package set
 
-// package set implements list which can delete item, specially intended to be able to get all items fast.
-
 import (
 	"fmt"
 	"testing"

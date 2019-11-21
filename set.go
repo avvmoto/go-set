@@ -1,3 +1,6 @@
+// Copyright 2019 avvmoto. All rights reserved.
+
+// package set implements list which can delete item, specially intended to be able to get all items fast.
 package set
 
 // ItemIterator allows callers of All() to iterate items.
@@ -35,7 +38,7 @@ func NewSet(c int) *Set {
 
 }
 
-// All iterate all items in the set
+// All iterate all items in the set.
 func (s *Set) All(fn Iterator) {
 	for i, item := range s.items {
 		if s.deleted[i] {
@@ -48,12 +51,12 @@ func (s *Set) All(fn Iterator) {
 	}
 }
 
-// Delete delete item from the set
+// Delete delete item from the set.
 func (s *Set) Delete(item int64) {
 	s.deleted[s.indexOf[item]] = true
 }
 
-// Append append item to the set
+// Append append item to the set.
 func (s *Set) Append(item int64) {
 	_, ok := s.indexOf[item]
 	if ok {
