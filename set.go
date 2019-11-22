@@ -6,17 +6,17 @@ package set
 // ItemIterator allows callers of All() to iterate items.
 // When this function returns false, iteration will stop and
 // the associated All() function will immediately return.
-type Iterator func(item interface{}) bool
+type Iterator func(item Item) bool
 
 type Interface interface {
 	// All iterate all items in the set
 	All(Iterator)
 
 	// Delete delete item from the set
-	Delete(item interface{})
+	Delete(item Item)
 
 	// Append append item to the set
-	Append(item interface{})
+	Append(item Item)
 }
 
 // Set implements list which can delete item, specially intended to be able to get all items fast.
@@ -24,7 +24,7 @@ type Interface interface {
 // See SetMap in set_test.go
 type Set struct {
 	indexOf map[interface{}]int
-	items   []interface{}
+	items   []Item
 	deleted []bool
 	len     int
 }
@@ -33,7 +33,7 @@ type Set struct {
 func NewSet(c int) *Set {
 	return &Set{
 		indexOf: make(map[interface{}]int, c),
-		items:   make([]interface{}, 0, c),
+		items:   make([]Item, 0, c),
 		deleted: make([]bool, 0, c),
 	}
 
@@ -53,19 +53,19 @@ func (s *Set) All(fn Iterator) {
 }
 
 // Delete delete item from the set.
-func (s *Set) Delete(item interface{}) {
-	s.deleted[s.indexOf[item]] = true
+func (s *Set) Delete(item Item) {
+	s.deleted[s.indexOf[item.Key()]] = true
 	s.len--
 }
 
 // Append append item to the set.
-func (s *Set) Append(item interface{}) {
-	_, ok := s.indexOf[item]
+func (s *Set) Append(item Item) {
+	_, ok := s.indexOf[item.Key()]
 	if ok {
 		panic("duplicate item")
 	}
 
-	s.indexOf[item] = len(s.items)
+	s.indexOf[item.Key()] = len(s.items)
 
 	s.items = append(s.items, item)
 	s.deleted = append(s.deleted, false)
@@ -82,4 +82,19 @@ func (s *Set) Clear() {
 // Len returns the number of items currently in the set.
 func (s *Set) Len() int {
 	return s.len
+}
+
+// Item represents a single object in the set.
+type Item interface {
+
+	// Key represents Item uniqueness. Key must be able to be used as map key.
+	Key() interface{}
+}
+
+// Int implements the Item interface for integers.
+type Int int
+
+// Key returns key for map.
+func (i Int) Key() interface{} {
+	return i
 }

@@ -8,9 +8,9 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-func getAll(fn func(Iterator)) (all []interface{}) {
-	it := func(item interface{}) bool {
-		all = append(all, item)
+func getAllAsInt(fn func(Iterator)) (all []int) {
+	it := func(item Item) bool {
+		all = append(all, int(item.(Int)))
 		return true
 	}
 
@@ -20,9 +20,9 @@ func getAll(fn func(Iterator)) (all []interface{}) {
 }
 
 func TestSet(t *testing.T) {
-	all := []interface{}{0, 1, 2, 3, 4, 5}
-	toDelete := []interface{}{0, 2, 4}
-	want := []interface{}{1, 3, 5}
+	all := []int{0, 1, 2, 3, 4, 5}
+	toDelete := []int{0, 2, 4}
+	want := []int{1, 3, 5}
 
 	cases := []struct {
 		set Interface
@@ -37,16 +37,16 @@ func TestSet(t *testing.T) {
 
 	for _, c := range cases {
 		for _, item := range all {
-			c.set.Append(item)
+			c.set.Append(Int(item))
 		}
 		for _, item := range toDelete {
-			c.set.Delete(item)
+			c.set.Delete(Int(item))
 		}
 
-		got := getAll(c.set.All)
+		got := getAllAsInt(c.set.All)
 
-		opt := cmpopts.SortSlices(func(x, y interface{}) bool {
-			return x.(int) < y.(int)
+		opt := cmpopts.SortSlices(func(x, y int) bool {
+			return x < y
 		})
 
 		if d := cmp.Diff(want, got, opt); d != "" {
@@ -87,30 +87,30 @@ func BenchmarkSet(b *testing.B) {
 						var i int64
 						b.ResetTimer()
 						for i = 0; i < benchmarkSetSize; i++ {
-							set.Append(i)
+							set.Append(Int(i))
 						}
 					})
 					b.Run("Delete", func(b *testing.B) {
 						set := c.newSet()
 						var i int64
 						for i = 0; i < benchmarkSetSize; i++ {
-							set.Append(i)
+							set.Append(Int(i))
 						}
 						b.ResetTimer()
 						for i = 0; i < benchmarkSetSize; i++ {
-							set.Delete(i)
+							set.Delete(Int(i))
 						}
 					})
 					b.Run("All", func(b *testing.B) {
 						set := c.newSet()
 						var i int64
 						for i = 0; i < benchmarkSetSize; i++ {
-							set.Append(i)
+							set.Append(Int(i))
 						}
 						b.ResetTimer()
 
-						set.All(func(item interface{}) bool {
-							i += item.(int64)
+						set.All(func(item Item) bool {
+							i += int64(item.(Int))
 							return true
 						})
 					})
@@ -123,18 +123,18 @@ func BenchmarkSet(b *testing.B) {
 // SetMap provie list which satisfy Interface interface.
 // This list simply use map as internal data structure.
 type SetMap struct {
-	items map[interface{}]struct{}
+	items map[interface{}]Item
 }
 
 func NewSetMap(c int) *SetMap {
 	return &SetMap{
-		items: make(map[interface{}]struct{}, c),
+		items: make(map[interface{}]Item, c),
 	}
 
 }
 
 func (s *SetMap) All(fn Iterator) {
-	for item, _ := range s.items {
+	for _, item := range s.items {
 
 		if !fn(item) {
 			break
@@ -142,10 +142,10 @@ func (s *SetMap) All(fn Iterator) {
 	}
 }
 
-func (s *SetMap) Delete(item interface{}) {
-	delete(s.items, item)
+func (s *SetMap) Delete(item Item) {
+	delete(s.items, item.Key())
 }
 
-func (s *SetMap) Append(item interface{}) {
-	s.items[item] = struct{}{}
+func (s *SetMap) Append(item Item) {
+	s.items[item.Key()] = item
 }
