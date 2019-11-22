@@ -19,6 +19,14 @@ func getAllAsInt(fn func(Iterator)) (all []int) {
 	return
 }
 
+type myItem struct {
+	i int
+}
+
+func (i myItem) Key() int {
+	return i.i
+}
+
 func TestSet(t *testing.T) {
 	all := []int{0, 1, 2, 3, 4, 5}
 	toDelete := []int{0, 2, 4}
@@ -40,7 +48,7 @@ func TestSet(t *testing.T) {
 			c.set.Append(Int(item))
 		}
 		for _, item := range toDelete {
-			c.set.Delete(Int(item))
+			c.set.Delete(myItem{item})
 		}
 
 		got := getAllAsInt(c.set.All)

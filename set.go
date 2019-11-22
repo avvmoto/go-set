@@ -23,7 +23,7 @@ type Interface interface {
 // All is faster, but Delete and Append may slower than Set who simply use map as internal data structure.
 // See SetMap in set_test.go
 type Set struct {
-	indexOf map[interface{}]int
+	indexOf map[int]int
 	items   []Item
 	deleted []bool
 	len     int
@@ -32,7 +32,7 @@ type Set struct {
 // NewSet create Set with given capacity c.
 func NewSet(c int) *Set {
 	return &Set{
-		indexOf: make(map[interface{}]int, c),
+		indexOf: make(map[int]int, c),
 		items:   make([]Item, 0, c),
 		deleted: make([]bool, 0, c),
 	}
@@ -95,13 +95,13 @@ func (s *Set) Len() int {
 type Item interface {
 
 	// Key represents Item uniqueness. Key must be able to be used as map key.
-	Key() interface{}
+	Key() int
 }
 
 // Int implements the Item interface for integers.
 type Int int
 
 // Key returns key for map.
-func (i Int) Key() interface{} {
-	return i
+func (i Int) Key() int {
+	return int(i)
 }
