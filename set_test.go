@@ -8,8 +8,8 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-func getAll(fn func(Iterator)) (all []int64) {
-	it := func(item int64) bool {
+func getAll(fn func(Iterator)) (all []interface{}) {
+	it := func(item interface{}) bool {
 		all = append(all, item)
 		return true
 	}
@@ -20,9 +20,9 @@ func getAll(fn func(Iterator)) (all []int64) {
 }
 
 func TestSet(t *testing.T) {
-	all := []int64{0, 1, 2, 3, 4, 5}
-	toDelete := []int64{0, 2, 4}
-	want := []int64{1, 3, 5}
+	all := []interface{}{0, 1, 2, 3, 4, 5}
+	toDelete := []interface{}{0, 2, 4}
+	want := []interface{}{1, 3, 5}
 
 	cases := []struct {
 		set Interface
@@ -45,8 +45,8 @@ func TestSet(t *testing.T) {
 
 		got := getAll(c.set.All)
 
-		opt := cmpopts.SortSlices(func(x, y int64) bool {
-			return x < y
+		opt := cmpopts.SortSlices(func(x, y interface{}) bool {
+			return x.(int) < y.(int)
 		})
 
 		if d := cmp.Diff(want, got, opt); d != "" {
@@ -109,8 +109,8 @@ func BenchmarkSet(b *testing.B) {
 						}
 						b.ResetTimer()
 
-						set.All(func(item int64) bool {
-							i += item
+						set.All(func(item interface{}) bool {
+							i += item.(int64)
 							return true
 						})
 					})
@@ -123,12 +123,12 @@ func BenchmarkSet(b *testing.B) {
 // SetMap provie list which satisfy Interface interface.
 // This list simply use map as internal data structure.
 type SetMap struct {
-	items map[int64]struct{}
+	items map[interface{}]struct{}
 }
 
 func NewSetMap(c int) *SetMap {
 	return &SetMap{
-		items: make(map[int64]struct{}, c),
+		items: make(map[interface{}]struct{}, c),
 	}
 
 }
@@ -142,10 +142,10 @@ func (s *SetMap) All(fn Iterator) {
 	}
 }
 
-func (s *SetMap) Delete(item int64) {
+func (s *SetMap) Delete(item interface{}) {
 	delete(s.items, item)
 }
 
-func (s *SetMap) Append(item int64) {
+func (s *SetMap) Append(item interface{}) {
 	s.items[item] = struct{}{}
 }
