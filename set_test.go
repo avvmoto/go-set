@@ -142,8 +142,9 @@ func (s *SetMap) All(fn Iterator) {
 	}
 }
 
-func (s *SetMap) Delete(item Item) {
+func (s *SetMap) Delete(item Item) Item {
 	delete(s.items, item.Key())
+	return nil // dummy
 }
 
 func (s *SetMap) Append(item Item) {

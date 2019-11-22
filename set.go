@@ -13,7 +13,7 @@ type Interface interface {
 	All(Iterator)
 
 	// Delete delete item from the set
-	Delete(item Item)
+	Delete(item Item) Item
 
 	// Append append item to the set
 	Append(item Item)
@@ -53,9 +53,16 @@ func (s *Set) All(fn Iterator) {
 }
 
 // Delete delete item from the set.
-func (s *Set) Delete(item Item) {
-	s.deleted[s.indexOf[item.Key()]] = true
+func (s *Set) Delete(item Item) Item {
+	idx, ok := s.indexOf[item.Key()]
+	if !ok {
+		return nil
+	}
+
+	s.deleted[idx] = true
 	s.len--
+
+	return s.items[idx]
 }
 
 // Append append item to the set.
