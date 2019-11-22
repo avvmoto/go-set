@@ -84,12 +84,17 @@ func (s *Set) Len() int {
 	return s.len
 }
 
+// Item represents a single object in the set.
 type Item interface {
+
+	// Key represents Item uniqueness. Key must be able to be used as map key.
 	Key() interface{}
 }
 
+// Int implements the Item interface for integers.
 type Int int
 
+// Key returns key for map.
 func (i Int) Key() interface{} {
 	return i
 }
