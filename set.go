@@ -26,6 +26,7 @@ type Set struct {
 	indexOf map[interface{}]int
 	items   []interface{}
 	deleted []bool
+	len     int
 }
 
 // NewSet create Set with given capacity c.
@@ -54,6 +55,7 @@ func (s *Set) All(fn Iterator) {
 // Delete delete item from the set.
 func (s *Set) Delete(item interface{}) {
 	s.deleted[s.indexOf[item]] = true
+	s.len--
 }
 
 // Append append item to the set.
@@ -67,4 +69,17 @@ func (s *Set) Append(item interface{}) {
 
 	s.items = append(s.items, item)
 	s.deleted = append(s.deleted, false)
+	s.len++
+}
+
+// Clear removes all items from the set.
+func (s *Set) Clear() {
+	s.items = s.items[:0]
+	s.deleted = s.deleted[:0]
+	s.len = 0
+}
+
+// Len returns the number of items currently in the set.
+func (s *Set) Len() int {
+	return s.len
 }
