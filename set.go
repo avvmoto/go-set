@@ -17,6 +17,9 @@ type Interface interface {
 
 	// Append append item to the set
 	Append(item Item)
+
+	// Clear removes all items from the set.
+	Clear()
 }
 
 // Set implements list which can delete item, specially intended to be able to get all items fast.
@@ -53,16 +56,14 @@ func (s *Set) All(fn Iterator) {
 }
 
 // Delete delete item from the set.
-func (s *Set) Delete(item Item) Item {
-	idx, ok := s.indexOf[item.Key()]
+func (s *Set) Delete(key int) {
+	idx, ok := s.indexOf[key]
 	if !ok {
-		return nil
+		return
 	}
 
 	s.deleted[idx] = true
 	s.len--
-
-	return s.items[idx]
 }
 
 // Append append item to the set.

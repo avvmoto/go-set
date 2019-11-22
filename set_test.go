@@ -67,7 +67,7 @@ func TestSet(t *testing.T) {
 
 func BenchmarkSet(b *testing.B) {
 
-	for _, benchmarkSetSize := range []int64{1000, 10000 * 100} {
+	for _, benchmarkSetSize := range []int64{100, 1000, 10000} {
 		cases := []struct {
 			desc   string
 			newSet func() Interface
@@ -116,11 +116,23 @@ func BenchmarkSet(b *testing.B) {
 							set.Append(Int(i))
 						}
 						b.ResetTimer()
+						for i = 0; i < benchmarkSetSize; i++ {
+							set.All(func(item Item) bool {
+								return true
+							})
+						}
+					})
+					b.Run("Reset", func(b *testing.B) {
+						set := c.newSet()
+						var i int64
+						for i = 0; i < benchmarkSetSize; i++ {
+							set.Append(Int(i))
+						}
+						b.ResetTimer()
 
-						set.All(func(item Item) bool {
-							i += int64(item.(Int))
-							return true
-						})
+						for i = 0; i < benchmarkSetSize; i++ {
+							set.Clear()
+						}
 					})
 				})
 			}
@@ -131,12 +143,12 @@ func BenchmarkSet(b *testing.B) {
 // SetMap provie list which satisfy Interface interface.
 // This list simply use map as internal data structure.
 type SetMap struct {
-	items map[interface{}]Item
+	items map[int]Item
 }
 
 func NewSetMap(c int) *SetMap {
 	return &SetMap{
-		items: make(map[interface{}]Item, c),
+		items: make(map[int]Item, c),
 	}
 
 }
@@ -157,4 +169,8 @@ func (s *SetMap) Delete(item Item) Item {
 
 func (s *SetMap) Append(item Item) {
 	s.items[item.Key()] = item
+}
+
+func (s *SetMap) Clear() {
+	s.items = map[int]Item{}
 }
