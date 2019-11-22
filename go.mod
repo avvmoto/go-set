@@ -1,4 +1,4 @@
-module set
+module github.com/avvmoto/go-set
 
 go 1.13
 
