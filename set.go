@@ -3,6 +3,8 @@
 // package set implements list which can delete item, specially intended to be able to get all items fast.
 package set
 
+import "fmt"
+
 // ItemIterator allows callers of All() to iterate items.
 // When this function returns false, iteration will stop and
 // the associated All() function will immediately return.
@@ -69,7 +71,7 @@ func (s *Set) Delete(item Item) Item {
 func (s *Set) Append(item Item) {
 	_, ok := s.indexOf[item.Key()]
 	if ok {
-		panic("duplicate item")
+		panic(fmt.Sprintf("duplicate item:%#v", item))
 	}
 
 	s.indexOf[item.Key()] = len(s.items)
