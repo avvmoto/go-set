@@ -74,11 +74,29 @@ func (s *Set) Append(item Item) {
 		panic(fmt.Sprintf("duplicate item:%#v", item))
 	}
 
+	s.append(item)
+}
+
+func (s *Set) append(item Item) {
 	s.indexOf[item.Key()] = len(s.items)
 
 	s.items = append(s.items, item)
 	s.deleted = append(s.deleted, false)
 	s.len++
+
+}
+
+// ReplaceOrAppend append the item to the set. If the item is already in the set, it would replace the item and return the item. Otherwise, nil is returned.
+func (s *Set) ReplaceOrAppend(item Item) Item {
+	idx, ok := s.indexOf[item.Key()]
+
+	if ok {
+		s.items[idx] = item
+		return item
+	}
+
+	s.append(item)
+	return nil
 }
 
 // Clear removes all items from the set.
