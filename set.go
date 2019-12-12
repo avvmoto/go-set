@@ -86,6 +86,16 @@ func (s *Set) append(item Item) {
 
 }
 
+func (s *Set) Get(item Item) Item {
+	idx, ok := s.indexOf[item.Key()]
+
+	if !ok {
+		return nil
+	}
+
+	return s.items[idx]
+}
+
 // ReplaceOrAppend append the item to the set. If the item is already in the set, it would replace the item and return the item. Otherwise, nil is returned.
 func (s *Set) ReplaceOrAppend(item Item) Item {
 	idx, ok := s.indexOf[item.Key()]
